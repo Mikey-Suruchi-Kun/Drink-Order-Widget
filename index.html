@@ -42,45 +42,112 @@
       margin-top: 10px;
       color: #666;
     }
+    .section {
+  margin: 18px 0;
+}
+
+.section p {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.order-btn {
+  margin-top: 15px;
+  background: #d8b4fe;
+}
+
+#brewing {
+  margin-top: 20px;
+  font-size: 16px;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
   </style>
+  
 </head>
 <body>
   <div class="card">
     <h2>☕ Digital Barista</h2>
-    <p>Click for your tiny daily booster.</p>
+    <p>Choose your order.</p>
 
-    <button onclick="orderDrink()">Order my drink</button>
+    <div class="section">
+      <p>Temperature</p>
+      <button onclick="setTemp('Iced')">Iced</button>
+      <button onclick="setTemp('Hot')">Hot</button>
+    </div>
 
+    <div class="section">
+      <p>Drink Type</p>
+      <button onclick="setType('Matcha')">Matcha</button>
+      <button onclick="setType('Coffee')">Coffee</button>
+      <button onclick="setType('Boba')">Boba</button>
+      <button onclick="setType('Random')">Random</button>
+    </div>
+
+    <button class="order-btn" onclick="orderDrink()">Brew my drink</button>
+
+    <div id="brewing"></div>
     <div id="drink"></div>
     <div id="message"></div>
   </div>
 
   <script>
-    const drinks = [
-      "Iced Matcha Latte 🍵",
-      "Strawberry Milk 🍓",
-      "Brown Sugar Boba 🧋",
-      "Lavender Latte 💜",
-      "Vanilla Chai ☕",
-      "Peach Green Tea 🍑",
-      "Honey Milk Tea 🍯"
-    ];
+  let selectedTemp = "Iced";
+  let selectedType = "Random";
 
-    const messages = [
-      "You earned a soft reset.",
-      "Your focus reward is ready.",
-      "A tiny treat for tiny progress.",
-      "Romanticizing productivity, one sip at a time.",
-      "Your digital barista is proud of you."
-    ];
+  const drinkOptions = {
+    Matcha: ["Matcha Latte 🍵", "Strawberry Matcha 🍓", "Honey Matcha 🍯"],
+    Coffee: ["Vanilla Latte ☕", "Caramel Macchiato 🤎", "Mocha Latte 🍫"],
+    Boba: ["Brown Sugar Boba 🧋", "Thai Milk Tea Boba 🧡", "Taro Boba 💜"]
+  };
 
-    function orderDrink() {
+  const messages = [
+    "You earned a soft reset.",
+    "Your focus reward is ready.",
+    "A tiny treat for tiny progress.",
+    "Productivity time.",
+    "Your digital barista is proud of you."
+  ];
+
+  function setTemp(temp) {
+    selectedTemp = temp;
+  }
+
+  function setType(type) {
+    selectedType = type;
+  }
+
+  function orderDrink() {
+    const brewing = document.getElementById("brewing");
+    const drinkDiv = document.getElementById("drink");
+    const messageDiv = document.getElementById("message");
+
+    drinkDiv.innerText = "";
+    messageDiv.innerText = "";
+    brewing.innerText = "Brewing your drink... ☁️";
+
+    setTimeout(() => {
+      let finalType = selectedType;
+
+      if (selectedType === "Random") {
+        const types = ["Matcha", "Coffee", "Boba"];
+        finalType = types[Math.floor(Math.random() * types.length)];
+      }
+
+      const drinks = drinkOptions[finalType];
       const drink = drinks[Math.floor(Math.random() * drinks.length)];
       const message = messages[Math.floor(Math.random() * messages.length)];
 
-      document.getElementById("drink").innerText = drink;
-      document.getElementById("message").innerText = message;
-    }
-  </script>
+      brewing.innerText = "";
+      drinkDiv.innerText = `${selectedTemp} ${drink}`;
+      messageDiv.innerText = message;
+    }, 1500);
+  }
+</script>
 </body>
 </html>

@@ -5,149 +5,187 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Quicksand', sans-serif;
-      background: #fff7f0;
-      display: flex;
-      justify-content: center;
-      padding: 30px;
+
+  
+<style>
+  body {
+    font-family: 'Quicksand', sans-serif;
+    background: #fff7f0;
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+  }
+
+  .card {
+    background: #fff7f0;
+    border-radius: 20px;
+    padding: 25px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  button {
+    border: none;
+    border-radius: 999px;
+    padding: 12px 18px;
+    cursor: pointer;
+    background: #f6b6c8;
+    font-size: 16px;
+    margin: 6px;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    box-shadow: 0 5px 0 #d98aa3;
+  }
+
+  button:active {
+    transform: translateY(5px);
+    box-shadow: 0 0 0 #d98aa3;
+  }
+
+  #drink {
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+  }
+
+  #message {
+    margin-top: 10px;
+    color: #666;
+  }
+
+  .steam {
+    font-size: 28px;
+    animation: float 1s infinite alternate;
+  }
+
+  @keyframes float {
+    from {
+      transform: translateY(0);
+      opacity: 0.5;
     }
 
-    .card {
-      background: #fff7f0;
-      border-radius: 20px;
-      padding: 25px;
-      width: 300px;
-      text-align: center;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    to {
+      transform: translateY(-8px);
+      opacity: 1;
     }
+  }
+</style>
 
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 12px 18px;
-      cursor: pointer;
-      background: #f6b6c8;
-      font-size: 16px;
-    }
-
-    #drink {
-      margin-top: 20px;
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    #message {
-      margin-top: 10px;
-      color: #666;
-    }
-    .section {
-  margin: 18px 0;
-}
-
-.section p {
-  margin-bottom: 8px;
-  font-weight: bold;
-}
-
-.order-btn {
-  margin-top: 15px;
-  background: #d8b4fe;
-}
-
-#brewing {
-  margin-top: 20px;
-  font-size: 16px;
-  animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.4; }
-  50% { opacity: 1; }
-  100% { opacity: 0.4; }
-}
-  </style>
   
 </head>
+
 <body>
   <div class="card">
-    <h2>☕ Digital Barista</h2>
-    <p>Choose your order.</p>
 
-    <div class="section">
-      <p>Temperature</p>
-      <button onclick="setTemp('Iced')">Iced</button>
-      <button onclick="setTemp('Hot')">Hot</button>
+    <div id="drinkStep">
+      <h2>☕ Pick your drink</h2>
+      <p>What kind of booster do you want?</p>
+
+      <button onclick="chooseDrink('Matcha')">Matcha 🍵</button>
+      <button onclick="chooseDrink('Coffee')">Coffee ☕</button>
+      <button onclick="chooseDrink('Boba')">Boba 🧋</button>
+      <button onclick="chooseDrink('Random')">Surprise Me ✨</button>
     </div>
 
-    <div class="section">
-      <p>Drink Type</p>
-      <button onclick="setType('Matcha')">Matcha</button>
-      <button onclick="setType('Coffee')">Coffee</button>
-      <button onclick="setType('Boba')">Boba</button>
-      <button onclick="setType('Random')">Random</button>
+    <div id="tempStep" class="hidden">
+      <h2>🌡️ Choose temp</h2>
+      <p>How should your drink be served?</p>
+
+      <button onclick="chooseTemp('Iced')">Iced 🧊</button>
+      <button onclick="chooseTemp('Hot')">Hot 🔥</button>
     </div>
 
-    <button class="order-btn" onclick="orderDrink()">Brew my drink</button>
+    <div id="brewingStep" class="hidden">
+      <h2>Brewing...</h2>
+      <div class="steam">☁️ ☁️ ☁️</div>
+      <p>Your digital barista is making your drink.</p>
+    </div>
 
-    <div id="brewing"></div>
-    <div id="drink"></div>
-    <div id="message"></div>
+    <div id="finalStep" class="hidden">
+      <h2>Order ready!</h2>
+      <div id="drink"></div>
+      <div id="message"></div>
+
+      <button onclick="restartOrder()">Order again</button>
+    </div>
+
   </div>
 
   <script>
-  let selectedTemp = "Iced";
-  let selectedType = "Random";
+    let selectedDrink = "";
+    let selectedTemp = "";
 
-  const drinkOptions = {
-    Matcha: ["Matcha Latte 🍵", "Strawberry Matcha 🍓", "Honey Matcha 🍯"],
-    Coffee: ["Vanilla Latte ☕", "Caramel Macchiato 🤎", "Mocha Latte 🍫"],
-    Boba: ["Brown Sugar Boba 🧋", "Thai Milk Tea Boba 🧡", "Taro Boba 💜"]
-  };
+    const drinkOptions = {
+      Matcha: ["Matcha Latte 🍵", "Strawberry Matcha 🍓", "Honey Matcha 🍯"],
+      Coffee: ["Vanilla Latte ☕", "Caramel Macchiato 🤎", "Mocha Latte 🍫"],
+      Boba: ["Brown Sugar Boba 🧋", "Thai Milk Tea Boba 🧡", "Taro Boba 💜"]
+    };
 
-  const messages = [
-    "You earned a soft reset.",
-    "Your focus reward is ready.",
-    "A tiny treat for tiny progress.",
-    "Productivity time.",
-    "Your digital barista is proud of you."
-  ];
+    const messages = [
+      "You earned a soft reset.",
+      "Your focus reward is ready.",
+      "A tiny treat for tiny progress.",
+      "Romanticizing productivity, one sip at a time.",
+      "Your digital barista is proud of you."
+    ];
 
-  function setTemp(temp) {
-    selectedTemp = temp;
-  }
+    function showStep(stepId) {
+      document.getElementById("drinkStep").classList.add("hidden");
+      document.getElementById("tempStep").classList.add("hidden");
+      document.getElementById("brewingStep").classList.add("hidden");
+      document.getElementById("finalStep").classList.add("hidden");
 
-  function setType(type) {
-    selectedType = type;
-  }
+      document.getElementById(stepId).classList.remove("hidden");
+    }
 
-  function orderDrink() {
-    const brewing = document.getElementById("brewing");
-    const drinkDiv = document.getElementById("drink");
-    const messageDiv = document.getElementById("message");
+    function chooseDrink(drink) {
+      selectedDrink = drink;
+      showStep("tempStep");
+    }
 
-    drinkDiv.innerText = "";
-    messageDiv.innerText = "";
-    brewing.innerText = "Brewing your drink... ☁️";
+    function chooseTemp(temp) {
+      selectedTemp = temp;
+      showStep("brewingStep");
 
-    setTimeout(() => {
-      let finalType = selectedType;
+      setTimeout(() => {
+        makeDrink();
+      }, 1500);
+    }
 
-      if (selectedType === "Random") {
+    function makeDrink() {
+      let finalDrinkType = selectedDrink;
+
+      if (selectedDrink === "Random") {
         const types = ["Matcha", "Coffee", "Boba"];
-        finalType = types[Math.floor(Math.random() * types.length)];
+        finalDrinkType = types[Math.floor(Math.random() * types.length)];
       }
 
-      const drinks = drinkOptions[finalType];
+      const drinks = drinkOptions[finalDrinkType];
       const drink = drinks[Math.floor(Math.random() * drinks.length)];
       const message = messages[Math.floor(Math.random() * messages.length)];
 
-      brewing.innerText = "";
-      drinkDiv.innerText = `${selectedTemp} ${drink}`;
-      messageDiv.innerText = message;
-    }, 1500);
-  }
-</script>
+      document.getElementById("drink").innerText = `${selectedTemp} ${drink}`;
+      document.getElementById("message").innerText = message;
+
+      showStep("finalStep");
+    }
+
+    function restartOrder() {
+      selectedDrink = "";
+      selectedTemp = "";
+      showStep("drinkStep");
+    }
+  </script>
 </body>
+  
 </html>
+
+
+
+
+
+
